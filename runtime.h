@@ -18,6 +18,12 @@ EXTERN_GENERATOR(lisp__and);
 EXTERN_GENERATOR(lisp__or);
 EXTERN_GENERATOR(lisp__not);
 
+EXTERN_GENERATOR(lisp__head);
+EXTERN_GENERATOR(lisp__tail);
+EXTERN_GENERATOR(lisp__append);
+EXTERN_GENERATOR(lisp__size);
+
+lisp__object *lisp__list_constructor();
 bool lisp__is_true(lisp__object *a);
 
 void runtime__init();
