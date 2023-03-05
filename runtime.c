@@ -206,7 +206,7 @@ void runtime__init() {
     LISP_INIT_RUNTIME_TEMPLATE(lisp__head, lisp__list_head, 1);
     LISP_INIT_RUNTIME_TEMPLATE(lisp__tail, lisp__list_tail, 1);
     LISP_INIT_RUNTIME_TEMPLATE(lisp__append, lisp__list_append, 2);
-    LISP_INIT_RUNTIME_TEMPLATE(lisp__size, lisp__list_head, 1);
+    LISP_INIT_RUNTIME_TEMPLATE(lisp__size, lisp__list_size, 1);
 //    lisp__eq = lisp__callable_constructor(lisp__equal_operation, 2, NULL);
 //    lisp__mul = lisp__callable_constructor(lisp__mult_operation, 2, NULL);
 //    lisp__sub = lisp__callable_constructor(lisp__sub_operation, 2, NULL);
