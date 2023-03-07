@@ -171,7 +171,7 @@ static lisp__object *lisp__list_tail(void *clojure, lisp__object *object) {
     lisp__object *nl = lisp__list_constructor();
     nl->value.l.size = object->value.l.size - 1;
     nl->value.l.list = calloc(nl->value.l.size, sizeof(lisp__object));
-    for (int i = 1; i < (int) (object->value.l.size - 1); i++) {
+    for (int i = 1; i < (int) (object->value.l.size); i++) {
         memcpy(&(nl->value.l.list[i - 1]), &(object->value.l.list[i]), sizeof(lisp__object));
     }
     return nl;
@@ -182,7 +182,7 @@ static lisp__object *lisp__list_append(void *clojure, lisp__object *list, lisp__
     lisp__object *nl = lisp__list_constructor();
     nl->value.l.size = list->value.l.size + 1;
     nl->value.l.list = calloc(nl->value.l.size, sizeof(lisp__object));
-    memcpy(nl->value.l.list, object->value.l.list, object->value.l.size * sizeof(lisp__object));
+    memcpy(nl->value.l.list, list->value.l.list, list->value.l.size * sizeof(lisp__object));
     memcpy(&(nl->value.l.list[nl->value.l.size-1]), object, sizeof(lisp__object));
     return nl;
 }
