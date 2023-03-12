@@ -38,4 +38,9 @@ ALLOCATE_AND_CREATE_OBJ_TEMPLATE_DEF(lisp__char_constructor, char);
 
 lisp__object *lisp__callable_constructor(void *function, int n, void *clojure);
 
+lisp__object *lisp__list_head(void *clojure, lisp__object *object);
+lisp__object *lisp__list_tail(void *clojure, lisp__object *object);
+lisp__object *lisp__list_append(void *clojure, lisp__object *list, lisp__object *object);
+lisp__object *lisp__list_size(void *clojure, lisp__object *object);
+
 #endif //GARBAGECOLLECTOR_RUNTIME_H

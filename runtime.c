@@ -153,7 +153,7 @@ lisp__object *lisp__list_constructor() {
 #define CHECK_THAT_LIST(obj) \
 assert(obj->type == LIST)
 lisp__object *lisp__head = NULL;
-static lisp__object *lisp__list_head(void *clojure, lisp__object *object) {
+lisp__object *lisp__list_head(void *clojure, lisp__object *object) {
     CHECK_THAT_LIST(object);
     if (object->value.l.size == 0) {
         return lisp__null_constructor();
@@ -163,7 +163,7 @@ static lisp__object *lisp__list_head(void *clojure, lisp__object *object) {
     return obj;
 }
 lisp__object *lisp__tail = NULL;
-static lisp__object *lisp__list_tail(void *clojure, lisp__object *object) {
+lisp__object *lisp__list_tail(void *clojure, lisp__object *object) {
     CHECK_THAT_LIST(object);
     if (object->value.l.size == 0) {
         return lisp__list_constructor();
@@ -171,23 +171,23 @@ static lisp__object *lisp__list_tail(void *clojure, lisp__object *object) {
     lisp__object *nl = lisp__list_constructor();
     nl->value.l.size = object->value.l.size - 1;
     nl->value.l.list = calloc(nl->value.l.size, sizeof(lisp__object));
-    for (int i = 1; i < (int) (object->value.l.size - 1); i++) {
+    for (int i = 1; i < (int) (object->value.l.size); i++) {
         memcpy(&(nl->value.l.list[i - 1]), &(object->value.l.list[i]), sizeof(lisp__object));
     }
     return nl;
 }
 lisp__object *lisp__append = NULL;
-static lisp__object *lisp__list_append(void *clojure, lisp__object *list, lisp__object *object) {
+lisp__object *lisp__list_append(void *clojure, lisp__object *list, lisp__object *object) {
     CHECK_THAT_LIST(list);
     lisp__object *nl = lisp__list_constructor();
     nl->value.l.size = list->value.l.size + 1;
     nl->value.l.list = calloc(nl->value.l.size, sizeof(lisp__object));
-    memcpy(nl->value.l.list, object->value.l.list, object->value.l.size * sizeof(lisp__object));
+    memcpy(nl->value.l.list, list->value.l.list, list->value.l.size * sizeof(lisp__object));
     memcpy(&(nl->value.l.list[nl->value.l.size-1]), object, sizeof(lisp__object));
     return nl;
 }
 lisp__object *lisp__size = NULL;
-static lisp__object *lisp__list_size(void *clojure, lisp__object *object) {
+lisp__object *lisp__list_size(void *clojure, lisp__object *object) {
     CHECK_THAT_LIST(object);
     return lisp__int_constructor((int) object->value.l.size);
 }
