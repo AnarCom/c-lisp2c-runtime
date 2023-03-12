@@ -153,7 +153,7 @@ lisp__object *lisp__list_constructor() {
 #define CHECK_THAT_LIST(obj) \
 assert(obj->type == LIST)
 lisp__object *lisp__head = NULL;
-static lisp__object *lisp__list_head(void *clojure, lisp__object *object) {
+lisp__object *lisp__list_head(void *clojure, lisp__object *object) {
     CHECK_THAT_LIST(object);
     if (object->value.l.size == 0) {
         return lisp__null_constructor();
@@ -163,7 +163,7 @@ static lisp__object *lisp__list_head(void *clojure, lisp__object *object) {
     return obj;
 }
 lisp__object *lisp__tail = NULL;
-static lisp__object *lisp__list_tail(void *clojure, lisp__object *object) {
+lisp__object *lisp__list_tail(void *clojure, lisp__object *object) {
     CHECK_THAT_LIST(object);
     if (object->value.l.size == 0) {
         return lisp__list_constructor();
@@ -177,7 +177,7 @@ static lisp__object *lisp__list_tail(void *clojure, lisp__object *object) {
     return nl;
 }
 lisp__object *lisp__append = NULL;
-static lisp__object *lisp__list_append(void *clojure, lisp__object *list, lisp__object *object) {
+lisp__object *lisp__list_append(void *clojure, lisp__object *list, lisp__object *object) {
     CHECK_THAT_LIST(list);
     lisp__object *nl = lisp__list_constructor();
     nl->value.l.size = list->value.l.size + 1;
@@ -187,7 +187,7 @@ static lisp__object *lisp__list_append(void *clojure, lisp__object *list, lisp__
     return nl;
 }
 lisp__object *lisp__size = NULL;
-static lisp__object *lisp__list_size(void *clojure, lisp__object *object) {
+lisp__object *lisp__list_size(void *clojure, lisp__object *object) {
     CHECK_THAT_LIST(object);
     return lisp__int_constructor((int) object->value.l.size);
 }
