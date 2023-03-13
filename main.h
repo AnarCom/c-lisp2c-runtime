@@ -22,7 +22,7 @@ typedef enum lisp__type lisp__type;
 
 struct lisp__list {
     size_t size;
-    lisp__object *list;
+    lisp__object **list;
 };
 typedef struct lisp__list lisp__list;
 

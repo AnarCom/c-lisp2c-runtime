@@ -151,42 +151,66 @@ lisp__object *lisp__list_constructor() {
 }
 
 #define CHECK_THAT_LIST(obj) \
-assert(obj->type == LIST)
+    assert(obj->type == LIST)
+
 lisp__object *lisp__head = NULL;
+
 lisp__object *lisp__list_head(void *clojure, lisp__object *object) {
     CHECK_THAT_LIST(object);
-    if (object->value.l.size == 0) {
-        return lisp__null_constructor();
-    }
-    lisp__object *obj = gc__new_object();
-    memcpy(obj, &(object->value.l.list[0]), sizeof(lisp__object));
-    return obj;
+//    if (object->value.l.size == 0) {
+//        return lisp__null_constructor();
+//    }
+    assert(object->value.l.size != 0);
+
+    return gc__inc_ref_counter(object->value.l.list[0]);
 }
+
 lisp__object *lisp__tail = NULL;
+
 lisp__object *lisp__list_tail(void *clojure, lisp__object *object) {
     CHECK_THAT_LIST(object);
-    if (object->value.l.size == 0) {
-        return lisp__list_constructor();
+//    assert(object->value.l.size != 0);
+//TODO: if 0 size ?
+        if (object->value.l.size == 0) {
+            return lisp__list_constructor();
+        }
+//    lisp__object *nl = lisp__list_constructor();
+//    nl->value.l.size = object->value.l.size - 1;
+//    nl->value.l.list = calloc(nl->value.l.size, sizeof(lisp__object));
+//    for (int i = 1; i < (int) (object->value.l.size); i++) {
+//        memcpy(&(nl->value.l.list[i - 1]), &(object->value.l.list[i]), sizeof(lisp__object));
+//    }
+//    return nl;
+    lisp__object *lst = lisp__list_constructor();
+    lst->value.l.size = object->value.l.size - 1;
+    lst->value.l.list = calloc(lst->value.l.size, sizeof(lisp__object *));
+    for (size_t i = 1; i < object->value.l.size; i++) {
+        lst->value.l.list[i-1] = gc__inc_ref_counter(object->value.l.list[i]);
     }
-    lisp__object *nl = lisp__list_constructor();
-    nl->value.l.size = object->value.l.size - 1;
-    nl->value.l.list = calloc(nl->value.l.size, sizeof(lisp__object));
-    for (int i = 1; i < (int) (object->value.l.size); i++) {
-        memcpy(&(nl->value.l.list[i - 1]), &(object->value.l.list[i]), sizeof(lisp__object));
-    }
-    return nl;
+    return lst;
 }
+
 lisp__object *lisp__append = NULL;
+
 lisp__object *lisp__list_append(void *clojure, lisp__object *list, lisp__object *object) {
     CHECK_THAT_LIST(list);
+//    lisp__object *nl = lisp__list_constructor();
+//    nl->value.l.size = list->value.l.size + 1;
+//    nl->value.l.list = calloc(nl->value.l.size, sizeof(lisp__object));
+//    memcpy(nl->value.l.list, list->value.l.list, list->value.l.size * sizeof(lisp__object));
+//    memcpy(&(nl->value.l.list[nl->value.l.size - 1]), object, sizeof(lisp__object));
     lisp__object *nl = lisp__list_constructor();
     nl->value.l.size = list->value.l.size + 1;
-    nl->value.l.list = calloc(nl->value.l.size, sizeof(lisp__object));
-    memcpy(nl->value.l.list, list->value.l.list, list->value.l.size * sizeof(lisp__object));
-    memcpy(&(nl->value.l.list[nl->value.l.size-1]), object, sizeof(lisp__object));
+    nl->value.l.list = calloc(nl->value.l.size, sizeof(lisp__object *));
+    for (size_t i = 0; i < list->value.l.size; i++) {
+        nl->value.l.list[i] = gc__inc_ref_counter(list->value.l.list[i]);
+    }
+    nl->value.l.list[nl->value.l.size - 1] = gc__inc_ref_counter(object);
     return nl;
 }
+
 lisp__object *lisp__size = NULL;
+
 lisp__object *lisp__list_size(void *clojure, lisp__object *object) {
     CHECK_THAT_LIST(object);
     return lisp__int_constructor((int) object->value.l.size);

@@ -27,7 +27,12 @@ lisp__object *gc__inc_ref_counter(lisp__object *object) {
 lisp__object *gc__dec_ref_counter(lisp__object *object) {
     object->ref_count--;
     if (object->ref_count == 0) {
-        //TODO: add check for list
+        if (object->type == LIST) {
+            for (size_t i = 0; i < object->value.l.size; i++) {
+                gc__dec_ref_counter(object->value.l.list[i]);
+            }
+            free(object->value.l.list);
+        }
         free(object);
         return NULL;
     }
