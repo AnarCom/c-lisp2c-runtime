@@ -32,6 +32,13 @@ lisp__object *gc__dec_ref_counter(lisp__object *object) {
                 gc__dec_ref_counter(object->value.l.list[i]);
             }
             free(object->value.l.list);
+        }else if (object->type == CALLABLE && object->value.callable.clojure != NULL) {
+            lisp__object** clj = object->value.callable.clojure;
+            size_t clojure_size = *(size_t *)clj;
+            for(size_t i = 0; i < clojure_size; i++){
+                gc__dec_ref_counter(clj[i+1]);
+            }
+            free(clj);
         }
         free(object);
         return NULL;

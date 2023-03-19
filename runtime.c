@@ -60,6 +60,8 @@ lisp__object * NAME (void * clojure, lisp__object *a, lisp__object *b) {\
         r->type = FLOAT;                                                \
         r->value.f = GET_NUMBER_VALUE(a) OPERATION GET_NUMBER_VALUE(b); \
    }                                                                    \
+   gc__dec_ref_counter(a);                                              \
+   gc__dec_ref_counter(b);                                              \
    return r;                                                            \
 }
 
@@ -124,16 +126,15 @@ lisp__object *lisp__not_operation(void *clojure, lisp__object *first) {
 lisp__object *lisp__eq = NULL;
 #define COMPARATION_OPERATION_TEMPLATE(NAME, OPERATION)                 \
 lisp__object* NAME (void * clojure, lisp__object *a, lisp__object *b) { \
-    gc__inc_ref_counter(a);                                             \
-    gc__inc_ref_counter(b);                                             \
     lisp__object *ans = NULL;                                           \
     if (a->type != b->type) {                                           \
         ans = lisp__bool_constructor(false);                            \
     } else if(a -> type == INT){                                        \
-        return lisp__bool_constructor(a->value.i == b->value.i);        \
+        ans = lisp__bool_constructor(a->value.i == b->value.i);        \
     }                                                                   \
-    printf("NOT IMPLEMENTED");                                          \
-    return NULL;                                                        \
+    gc__dec_ref_counter(a);                                             \
+    gc__dec_ref_counter(b);                                             \
+    return ans;                                                        \
 }
 
 COMPARATION_OPERATION_TEMPLATE(lisp__equal_operation, ==)
@@ -162,6 +163,7 @@ lisp__object *lisp__list_head(void *clojure, lisp__object *object) {
 //    }
     assert(object->value.l.size != 0);
 
+    gc__dec_ref_counter(object);
     return gc__inc_ref_counter(object->value.l.list[0]);
 }
 
@@ -187,6 +189,7 @@ lisp__object *lisp__list_tail(void *clojure, lisp__object *object) {
     for (size_t i = 1; i < object->value.l.size; i++) {
         lst->value.l.list[i-1] = gc__inc_ref_counter(object->value.l.list[i]);
     }
+    gc__dec_ref_counter(object);
     return lst;
 }
 
@@ -206,6 +209,8 @@ lisp__object *lisp__list_append(void *clojure, lisp__object *list, lisp__object 
         nl->value.l.list[i] = gc__inc_ref_counter(list->value.l.list[i]);
     }
     nl->value.l.list[nl->value.l.size - 1] = gc__inc_ref_counter(object);
+    gc__dec_ref_counter(list);
+    gc__dec_ref_counter(object);
     return nl;
 }
 
@@ -213,6 +218,7 @@ lisp__object *lisp__size = NULL;
 
 lisp__object *lisp__list_size(void *clojure, lisp__object *object) {
     CHECK_THAT_LIST(object);
+    gc__dec_ref_counter(object);
     return lisp__int_constructor((int) object->value.l.size);
 }
 
