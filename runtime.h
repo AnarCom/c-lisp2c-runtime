@@ -22,6 +22,7 @@ EXTERN_GENERATOR(lisp__head);
 EXTERN_GENERATOR(lisp__tail);
 EXTERN_GENERATOR(lisp__append);
 EXTERN_GENERATOR(lisp__size);
+EXTERN_GENERATOR(lisp__print);
 
 lisp__object *lisp__list_constructor();
 bool lisp__is_true(lisp__object *a);

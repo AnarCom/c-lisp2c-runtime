@@ -117,7 +117,7 @@ BOOLEAN_OPERATION_TEMPLATE(lisp__or_operation, ||)
 lisp__object *lisp__not_operation(void *clojure, lisp__object *first) {
     CHECK_IS_BOOL(first);
     gc__inc_ref_counter(first);
-    lisp__object *ans = lisp__bool_constructor(first->value.b);
+    lisp__object *ans = lisp__bool_constructor(!first->value.b);
     gc__dec_ref_counter(first);
     return ans;
 }
@@ -131,7 +131,12 @@ lisp__object* NAME (void * clojure, lisp__object *a, lisp__object *b) { \
         ans = lisp__bool_constructor(false);                            \
     } else if(a -> type == INT){                                        \
         ans = lisp__bool_constructor(a->value.i == b->value.i);        \
+    } else if (a -> type == CHAR){                                      \
+        ans = lisp__bool_constructor(a->value.c == b->value.c);         \
+    } else {                                                            \
+    assert(false);                                                      \
     }                                                                   \
+                                                                        \
     gc__dec_ref_counter(a);                                             \
     gc__dec_ref_counter(b);                                             \
     return ans;                                                        \
@@ -222,6 +227,50 @@ lisp__object *lisp__list_size(void *clojure, lisp__object *object) {
     return lisp__int_constructor((int) object->value.l.size);
 }
 
+lisp__object *lisp__print = NULL;
+static void lisp__print_elem(lisp__object* obj, bool end_string);
+lisp__object *lisp__print_function(void* clojure, lisp__object* obj){
+        lisp__print_elem(obj, true);
+    return lisp__null_constructor();
+}
+static void lisp__print_elem(lisp__object* obj, bool end_string){
+    switch (obj->type) {
+        case INT:
+            printf("%d", obj->value.i);
+            break;
+        case FLOAT:
+            printf("%f", obj->value.f);
+            break;
+        case BOOL:
+            printf("%s", obj->value.b ? "TRUE" : "FALSE");
+            break;
+        case NUL:
+            printf("NULL");
+            break;
+        case CHAR:
+            printf("'%c'", obj->value.c);
+            break;
+        case LIST:
+
+            printf("[");
+            for(size_t i = 0; i < obj->value.l.size; i++){
+                lisp__print_elem(obj->value.l.list[i], false);
+                printf(", ");
+            }
+            printf("]");
+            break;
+        case VOID:
+            printf("VOID");
+            break;
+        case CALLABLE:
+            printf("callable");
+            break;
+    }
+    if(end_string){
+        printf("\n");
+    }
+}
+
 void runtime__init() {
     gc__init();
     LISP_INIT_RUNTIME_TEMPLATE(lisp__eq, lisp__equal_operation, 2);
@@ -237,12 +286,6 @@ void runtime__init() {
     LISP_INIT_RUNTIME_TEMPLATE(lisp__tail, lisp__list_tail, 1);
     LISP_INIT_RUNTIME_TEMPLATE(lisp__append, lisp__list_append, 2);
     LISP_INIT_RUNTIME_TEMPLATE(lisp__size, lisp__list_size, 1);
-//    lisp__eq = lisp__callable_constructor(lisp__equal_operation, 2, NULL);
-//    lisp__mul = lisp__callable_constructor(lisp__mult_operation, 2, NULL);
-//    lisp__sub = lisp__callable_constructor(lisp__sub_operation, 2, NULL);
-//    lisp__add = lisp__callable_constructor(lisp__add_operation, 2, NULL);
-//    lisp__div = lisp__callable_constructor(lisp__div_operation, 2, NULL);
-//    lisp__or = lisp__callable_constructor(lisp__or_operation, 2, NULL);
-//    lisp__and = lisp__callable_constructor(lisp__and_operation, 2, NULL);
-//    lisp__not = lisp__callable_constructor(lisp__not_operation, 1, NULL);
+
+    LISP_INIT_RUNTIME_TEMPLATE(lisp__print, lisp__print_function, 1);
 }
