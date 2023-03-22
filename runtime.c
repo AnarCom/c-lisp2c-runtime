@@ -250,14 +250,29 @@ static void lisp__print_elem(lisp__object* obj, bool end_string){
         case CHAR:
             printf("'%c'", obj->value.c);
             break;
-        case LIST:
-
-            printf("[");
-            for(size_t i = 0; i < obj->value.l.size; i++){
-                lisp__print_elem(obj->value.l.list[i], false);
-                printf(", ");
+        case LIST: {
+            int isString = 1;
+            for (size_t i = 0; i < obj->value.l.size; i++) {
+                if (obj->value.l.list[i]->type != CHAR) {
+                    isString = 0;
+                    break;
+                }
             }
-            printf("]");
+            if (isString) {
+                putchar('"');
+                for (size_t i = 0; i < obj->value.l.size; i++) {
+                    putchar(obj->value.l.list[i]->value.c);
+                }
+                putchar('"');
+            } else {
+                printf("[");
+                for (size_t i = 0; i < obj->value.l.size; i++) {
+                    lisp__print_elem(obj->value.l.list[i], false);
+                    if (i != obj->value.l.size - 1) { printf(", "); }
+                }
+                printf("]");
+            }
+        }
             break;
         case VOID:
             printf("VOID");
